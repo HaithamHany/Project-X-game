@@ -352,7 +352,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 2
-  _rotationSpeed: 0.01
+  _jumpPower: 10
+  _WhatIsGround:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _rotationSpeed: 0.08
 --- !u!54 &1336483437
 Rigidbody:
   m_ObjectHideFlags: 0

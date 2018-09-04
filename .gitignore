@@ -29,3 +29,7 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+.vs/Project X/v15/Server/sqlite3/db.lock
+.vs/Project X/v15/Server/sqlite3/storage.ide-shm
+.vs/Project X/v15/Server/sqlite3/storage.ide
+.vs/Project X/v15/Server/sqlite3/storage.ide-wal
