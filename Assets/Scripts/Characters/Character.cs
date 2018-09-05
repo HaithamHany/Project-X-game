@@ -74,22 +74,18 @@ public class Character : MonoBehaviour {
     }
     public void Jump()
     {
-
-        Debug.Log(_jumpTime);
-
-        if (!_grounded&&_jumpTime>=_jumpDuration)
+        if (!_grounded&&_jumpTime>=_jumpDuration) //fast falling
             _characterRigBody.velocity = new Vector3(_moveHorizontal, -_verticalSpeed, 0);
 
-        if (!_grounded && _jumpTime <= _jumpDuration)
+        if (!_grounded && _jumpTime <= _jumpDuration) //slow or fast jumping
         {
             _jumpTime += Time.deltaTime;
             _characterRigBody.AddForce(new Vector3(_moveHorizontal*_jumpPower,_jumpPower,0));
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
-            if (_grounded)
+            if (_grounded)//check if grounded
             {
-                // _characterRigBody.AddForce(new Vector3(_moveHorizontal, _jumpPower, 0));
                 _characterRigBody.velocity = Vector3.up;
                 _grounded = false;
                 _jumpTime = 0;
