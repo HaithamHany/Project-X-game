@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //this class should be Abstract class only
+[RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour {
     public enum Oriantation
     {
@@ -11,16 +12,21 @@ public class Character : MonoBehaviour {
 
     [SerializeField]
     private float _speed;
-    [SerializeField]private float _jumpPower;
+    [SerializeField] private float _jumpPower;
     private float _health;
     private Animator _anim;
     private Rigidbody _characterRigBody;
     private GameObject _opponent;
+    private float _moveHorizontal;
 
     //for jumping
-    private bool _Grounded=false;
-    [SerializeField] private LayerMask _WhatIsGround;
-    const float _GroundedRadius = .2f;
+    private bool _grounded;
+    [SerializeField] private LayerMask _whatIsGround;
+    const float _groundedRadius = 0.005f;
+    [SerializeField] private float _verticalSpeed;
+    private float _jumpTime = 0;
+    [SerializeField][Range(0.1f, 1f)] private float _jumpDuration;
+
 
     [SerializeField][Range(0.01f,0.15f)]protected float _rotationSpeed= 0.08f;
     protected Oriantation _oriantation;
@@ -42,19 +48,21 @@ public class Character : MonoBehaviour {
     }
 
 
+
     protected virtual void Awake () {
 
+        _jumpTime = _jumpDuration;
         _oriantation = Oriantation.left;
         _anim = GetComponent<Animator>();
         _characterRigBody = GetComponent<Rigidbody>();
         _opponent = GameObject.FindGameObjectWithTag("Opponent");
-	}
+        
+    }
 
     public void Move()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-
-        Vector3 movement = new Vector3(moveHorizontal, _characterRigBody.velocity.y, _characterRigBody.velocity.z);
+        _moveHorizontal = Input.GetAxis("Horizontal");
+        Vector3 movement = new Vector3(_moveHorizontal, _characterRigBody.velocity.y, _characterRigBody.velocity.z);
         _characterRigBody.velocity = (movement*Speed)/4;
         if (_oriantation == Oriantation.left)
             _anim.SetFloat("Velocity", _characterRigBody.velocity.x);
@@ -66,7 +74,29 @@ public class Character : MonoBehaviour {
     }
     public void Jump()
     {
-        
+
+        Debug.Log(_jumpTime);
+
+        if (!_grounded&&_jumpTime>=_jumpDuration)
+            _characterRigBody.velocity = new Vector3(_moveHorizontal, -_verticalSpeed, 0);
+
+        if (!_grounded && _jumpTime <= _jumpDuration)
+        {
+            _jumpTime += Time.deltaTime;
+            _characterRigBody.AddForce(new Vector3(_moveHorizontal*_jumpPower,_jumpPower,0));
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            if (_grounded)
+            {
+                // _characterRigBody.AddForce(new Vector3(_moveHorizontal, _jumpPower, 0));
+                _characterRigBody.velocity = Vector3.up;
+                _grounded = false;
+                _jumpTime = 0;
+            }
+
+        _grounded = Physics.CheckSphere(transform.position, _groundedRadius, _whatIsGround);
+        _anim.SetBool("Ground", _grounded);
     }
     private void LookAtOpponent(float rotSpeed)
     {
