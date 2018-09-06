@@ -31,6 +31,9 @@ public class Character : MonoBehaviour {
     [SerializeField][Range(0.01f,0.15f)]protected float _rotationSpeed= 0.08f;
     protected Oriantation _oriantation;
 
+    //for punching
+    private bool _jabPunch;
+
     public float Speed
     {
         get { return _speed; }
@@ -58,7 +61,6 @@ public class Character : MonoBehaviour {
         _opponent = GameObject.FindGameObjectWithTag("Opponent");
         
     }
-
     public void Move()
     {
         _moveHorizontal = Input.GetAxis("Horizontal");
@@ -72,28 +74,35 @@ public class Character : MonoBehaviour {
         LookAtOpponent(_rotationSpeed);
 
     }
-    public void Jump()
+    protected virtual void Jump(KeyCode key)
     {
-        if (!_grounded&&_jumpTime>=_jumpDuration) //fast falling
+        if (!_grounded && _jumpTime >= _jumpDuration) //fast falling
             _characterRigBody.velocity = new Vector3(_moveHorizontal, -_verticalSpeed, 0);
 
         if (!_grounded && _jumpTime <= _jumpDuration) //slow or fast jumping
         {
             _jumpTime += Time.deltaTime;
-            _characterRigBody.AddForce(new Vector3(_moveHorizontal*_jumpPower,_jumpPower,0));
+            _characterRigBody.AddForce(new Vector3(_moveHorizontal * _jumpPower, _jumpPower, 0), ForceMode.Acceleration);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-            if (_grounded)//check if grounded
+        _grounded = Input.GetKeyDown(key);
+        if (_grounded)//check if grounded
             {
                 _characterRigBody.velocity = Vector3.up;
-                _grounded = false;
                 _jumpTime = 0;
             }
 
         _grounded = Physics.CheckSphere(transform.position, _groundedRadius, _whatIsGround);
         _anim.SetBool("Ground", _grounded);
+    } // protected So if any other inherted character have a special type of jump this func. can be overridden
+    protected virtual void Punch(KeyCode key)
+    {
+        
+        _jabPunch = Input.GetKeyDown(key);
+        _anim.SetBool("JabPunch", _jabPunch);
+        _jabPunch = false;
     }
+
     private void LookAtOpponent(float rotSpeed)
     {
         //getting the direction that should be looking at which is in this case the opponent
@@ -121,6 +130,7 @@ public class Character : MonoBehaviour {
     {
        
         Move();
-        Jump();
+        Jump(KeyCode.Space);
+        Punch(KeyCode.Z);
     }
 }

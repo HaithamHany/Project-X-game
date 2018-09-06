@@ -356,7 +356,7 @@ MonoBehaviour:
   _whatIsGround:
     serializedVersion: 2
     m_Bits: 512
-  _verticalSpeed: 0.8
+  _verticalSpeed: 0.9
   _jumpDuration: 0.25
   _rotationSpeed: 0.08
 --- !u!54 &1336483437
